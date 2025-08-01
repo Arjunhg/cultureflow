@@ -52,7 +52,7 @@ interface QlooAudienceResponse {
 
 class QlooService {
   private baseUrl = 'https://hackathon.api.qloo.com';
-  private apiKey = 'rBHhfj3frxfAPeto7asHgL8Q6WRljL4o4tPZ5brGrSk';
+  private apiKey = process.env.NEXT_PUBLIC_QLOO_API_KEY!;
 
   private async makeRequest(endpoint: string, params?: Record<string, any>) {
     const url = new URL(endpoint, this.baseUrl);
