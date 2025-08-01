@@ -1,3 +1,4 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 interface QlooInsightRequest {
   'filter.type': string;
   'signal.interests.entities'?: string[];
@@ -48,16 +49,6 @@ interface QlooAudienceResponse {
   totalRequestDuration: number;
 }
 
-// Allowed entity types for hackathon API
-const ALLOWED_ENTITY_TYPES = [
-  'movie',
-  'music_artist', 
-  'tv_show',
-  'book',
-  'person',
-  'podcast',
-  'video_game'
-];
 
 class QlooService {
   private baseUrl = 'https://hackathon.api.qloo.com';
@@ -107,6 +98,7 @@ class QlooService {
     // Use free-text search without type filtering to avoid 403 errors
     // Note: hackathon API uses 'query' parameter, not 'q'
     // Limit parameter may not work on hackathon API, so we'll limit client-side
+    console.log('Searching entities with query:', query, 'preferredType:', preferredType);
     const response = await this.makeRequest('/search', {
       query: query
     });

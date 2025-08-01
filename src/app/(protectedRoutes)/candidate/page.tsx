@@ -2,7 +2,7 @@
 
 import PageHeader from '@/components/ui/ReusableComponents/PageHeader';
 import { Webcam, GitFork, Brain, Target, Palette, Sparkles } from 'lucide-react';
-import React from 'react';
+import React, { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -10,9 +10,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { leadData } from './__tests__/data';
 import CulturalCandidateAnalysis from '@/components/CulturalCandidateAnalysis';
 import CulturalProfileManager from '@/components/CulturalProfileManager';
+import CandidateSessionIntegration from '@/components/CandidateSessionIntegration';
 
-const page = () => {
-  const [expandedRow, setExpandedRow] = React.useState<number | null>(null);
+const CandidatePage = () => {
+  const [expandedRow, setExpandedRow] = useState<number | null>(null);
 
   const toggleRowExpansion = (index: number) => {
     setExpandedRow(expandedRow === index ? null : index);
@@ -136,11 +137,21 @@ const page = () => {
                       <TableRow className="border-0 bg-gradient-to-br from-purple-50/80 via-indigo-50/80 to-pink-50/80 dark:from-purple-900/20 dark:via-indigo-900/20 dark:to-pink-900/20">
                         <TableCell colSpan={4} className="py-6">
                           <div className="max-w-6xl">
-                            <Tabs defaultValue="analysis" className="space-y-4">
-                              <TabsList className="grid w-full grid-cols-2">
+                            <Tabs defaultValue="session" className="space-y-4">
+                              <TabsList className="grid w-full grid-cols-3">
+                                <TabsTrigger value="session">Live Session</TabsTrigger>
                                 <TabsTrigger value="analysis">Cultural Analysis</TabsTrigger>
-                                <TabsTrigger value="profile">Live Profile Manager</TabsTrigger>
+                                <TabsTrigger value="profile">Profile Manager</TabsTrigger>
                               </TabsList>
+
+                              <TabsContent value="session">
+                                <CandidateSessionIntegration
+                                  candidateId={`candidate-${idx}`}
+                                  candidateName={lead.name}
+                                  candidateEmail={lead.email}
+                                  roleType={lead.roleType}
+                                />
+                              </TabsContent>
 
                               <TabsContent value="analysis">
                                 <CulturalCandidateAnalysis
@@ -176,4 +187,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default CandidatePage;

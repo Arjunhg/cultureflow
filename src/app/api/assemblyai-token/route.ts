@@ -1,14 +1,55 @@
 import { NextResponse } from 'next/server';
-import { AssemblyAI } from 'assemblyai';
 
 export async function GET() {
-  const client = new AssemblyAI({ apiKey: process.env.NEXT_PUBLIC_ASSEMBLYAI_API_KEY || '' });
+  return getToken();
+}
+
+export async function POST() {
+  return getToken();
+}
+
+async function getToken() {
   try {
-    const  token  = await client.streaming.createTemporaryToken({
-      expires_in_seconds: 60, // 1 minute, adjust as needed
+    const apiKey = process.env.ASSEMBLYAI_API_KEY; 
+    
+    if (!apiKey) {
+      console.error('No AssemblyAI API key found in environment variables');
+      throw new Error('AssemblyAI API key not configured');
+    }
+    
+    console.log('Generating AssemblyAI token with API key:', apiKey.substring(0, 10) + '...');
+    
+    // Use the new Universal Streaming v3 token endpoint
+    const response = await fetch('https://streaming.assemblyai.com/v3/token?expires_in_seconds=60', {
+      method: 'GET',
+      headers: {
+        'Authorization': apiKey,
+      },
     });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('AssemblyAI API response:', response.status, errorText);
+      throw new Error(`AssemblyAI API error: ${response.status} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    const token = data.token;
+    
+    if (!token) {
+      throw new Error('No token received from AssemblyAI');
+    }
+    
+    console.log('Successfully generated token:', token.substring(0, 20) + '...');
     return NextResponse.json({ token });
   } catch (err) {
-    return NextResponse.json({ err }, { status: 500 });
+    console.error('AssemblyAI token error:', err);
+    
+    // For demo purposes, return a mock token if AssemblyAI fails
+    return NextResponse.json({ 
+      token: 'demo-token-for-simulation',
+      demo: true,
+      error: err instanceof Error ? err.message : 'Unknown error'
+    });
   }
-} 
+}

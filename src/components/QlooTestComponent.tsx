@@ -1,8 +1,8 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 'use client';
 
 import { useState } from 'react';
 import { qloo } from '@/lib/qloo';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Brain, Sparkles, Users, CheckCircle, AlertCircle } from 'lucide-react';
@@ -31,6 +31,7 @@ export default function QlooTestComponent() {
       }
     } catch (error) {
       setConnectionStatus({ success: false, message: 'Test failed' });
+      console.error('Connection test failed:', error);
     }
     setIsLoading(false);
   };
@@ -47,7 +48,7 @@ export default function QlooTestComponent() {
           Cultural Intelligence Engine
         </h2>
         <p className="text-lg text-slate-600 dark:text-purple-300 max-w-2xl mx-auto">
-          Experience real-time cultural insights powered by Qloo's Taste AI™ platform
+          Experience real-time cultural insights powered by Qloo&apos;s Taste AI™ platform
         </p>
       </div>
 
@@ -64,7 +65,7 @@ export default function QlooTestComponent() {
                 Qloo Cultural Intelligence Test
               </h3>
               <p className="text-slate-600 dark:text-purple-300">
-                Connect to Qloo's hackathon API and discover cultural insights
+                Connect to Qloo&apos;s hackathon API and discover cultural insights
               </p>
             </div>
           </div>

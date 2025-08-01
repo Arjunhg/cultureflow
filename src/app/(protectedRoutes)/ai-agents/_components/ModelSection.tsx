@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Brain } from 'lucide-react'
 import React from 'react'
 import ModelConfiguration from './ModelConfiguration'
-import RealTimeCallAnalysis from '@/components/RealTimeCallAnalysis'
+import ActiveSessionsManager from '@/components/ActiveSessionsManager'
 
 const ModelSection = () => {
   return (
@@ -33,20 +33,14 @@ const ModelSection = () => {
             <div className="space-y-6">
               <div className="text-center space-y-2 mb-6">
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  Live Cultural Intelligence
+                  Live Cultural Intelligence Sessions
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400">
-                  Test real-time cultural analysis during sales conversations
+                  Manage and monitor cultural analysis for active VAPI interviews
                 </p>
               </div>
               
-              <RealTimeCallAnalysis 
-                candidateName="Demo Candidate"
-                roleType="Sales Role"
-                onAnalysisUpdate={(analysis) => {
-                  console.log('Real-time analysis update:', analysis);
-                }}
-              />
+              <ActiveSessionsManager />
             </div>
           </ScrollArea>
         </TabsContent>

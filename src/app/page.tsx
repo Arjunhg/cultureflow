@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Play, Users, TrendingUp, Brain, Target, Palette, MessageSquare, Sparkles, Zap } from "lucide-react";
+import { ArrowRight, Play, Users, Brain, Target, Palette, MessageSquare, Sparkles, Zap } from "lucide-react";
 
 export default function Home() {
   return (
@@ -62,7 +62,7 @@ export default function Home() {
 
           {/* Description */}
           <p className="text-xl lg:text-2xl text-slate-600 dark:text-purple-300 max-w-3xl mx-auto leading-relaxed">
-            Revolutionize your sales approach with AI-powered cultural insights. Understand prospects' tastes, preferences, and cultural contexts to create deeply personalized business conversations that drive results.
+            Revolutionize your sales approach with AI-powered cultural insights. Understand prospect tastes, preferences, and cultural contexts to create deeply personalized business conversations that drive results.
           </p>
 
           {/* CTA Buttons */}

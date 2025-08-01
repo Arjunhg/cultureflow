@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { qloo } from '@/lib/qloo';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Test Qloo connection
     const connectionTest = await qloo.testConnection();

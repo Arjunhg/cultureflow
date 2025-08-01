@@ -1,4 +1,4 @@
-import {TrendingUp, Users, Brain, Target, Palette, Calendar, MessageSquare, Sparkles, Activity } from "lucide-react";
+import {TrendingUp, Brain, Target, Palette,  MessageSquare, Sparkles, Activity } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import FeatureCard from "./_components/FeatureCard";
 import FeatureSectionLayout from "./_components/FeatureSectionLayout";

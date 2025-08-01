@@ -50,7 +50,7 @@ export default function RealTimeAnalytics({ className = '' }: RealTimeAnalyticsP
   useEffect(() => {
     // Simulate real-time data updates
     const interval = setInterval(() => {
-      setAnalytics(prev => {
+      setAnalytics(() => {
         const mockData: AnalyticsData = {
           activeCalls: Math.floor(Math.random() * 5) + 1,
           totalCandidates: 47 + Math.floor(Math.random() * 10),

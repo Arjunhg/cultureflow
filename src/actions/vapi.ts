@@ -40,7 +40,7 @@ export const createAssistant = async (name: string) => {
       name,
       voice: {
         provider: 'vapi',
-        voiceId: 'Alex', // Changed to Alex to match the interviewer persona
+        voiceId: 'Elliot', // Using valid VAPI voice ID
       },
       firstMessage: firstMessage,
       model: {
@@ -58,6 +58,11 @@ export const createAssistant = async (name: string) => {
         provider: 'deepgram',
         model: 'nova-2',
         keywords: ['HireFlow', 'technical', 'interview', 'hiring', 'collaboration']
+      },
+      // Add webhook URL for real-time session detection (requires HTTPS)
+      // For local development, either use ngrok tunnel or deploy to get HTTPS URL
+      server: {
+        url: `${process.env.NEXT_PUBLIC_BASE_URL || process.env.VERCEL_URL || 'http://localhost:3000'}/api/vapi-webhook`
       },
       endCallFunctionEnabled: true,
       endCallMessage: "Thank you for your time today. The interview has been completed successfully. You should hear back from our team within the next few business days. Have a great day!",
@@ -121,13 +126,18 @@ export const updateAssistant = async (
       },
       voice: {
         provider: 'vapi',
-        voiceId: 'Alex', // Consistent with create function
+        voiceId: 'Elliot', // Using valid VAPI voice ID
       },
       transcriber: {
         provider: 'deepgram',
         model: 'nova-2',
         keywords: ['HireFlow', 'technical', 'interview', 'hiring', 'collaboration']
       },
+      // Add webhook URL for real-time session detection (requires HTTPS)
+      // For local development, either use ngrok tunnel or deploy to get HTTPS URL
+      // server: {
+      //   url: `${process.env.NEXT_PUBLIC_BASE_URL || process.env.VERCEL_URL || 'http://localhost:3000'}/api/vapi-webhook`
+      // },
       endCallFunctionEnabled: true,
       endCallMessage: "Thank you for your time today. The interview has been completed successfully. You should hear back from our team within the next few business days. Have a great day!",
       maxDurationSeconds: 360,

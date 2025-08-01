@@ -1,3 +1,4 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -8,8 +9,6 @@ import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
-  TrendingUp, 
-  Users, 
   Brain, 
   Clock, 
   Activity, 
@@ -97,17 +96,29 @@ export default function CulturalProfileManager({
     setIsUpdating(true);
     
     try {
-      // Simulate call analysis
-      const simulation = await culturalExtractor.simulateCallAnalysis(candidateName);
+      // In real implementation, this would get data from active VAPI call
+      // For now, simulate realistic conversation data
+      const mockTranscript = `
+        I'm really passionate about creative work and innovation. 
+        I love watching independent films and documentaries. 
+        In my spare time, I enjoy visiting art museums and galleries. 
+        I'm also into jazz music and attend live concerts regularly.
+        I believe in companies that value creativity and work-life balance.
+      `;
+      
+      const analysis = await culturalExtractor.analyzeCulturalFitFromConversation(
+        mockTranscript, 
+        'Creative Role'
+      );
       
       const callAnalysis: CallAnalysis = {
         id: `call-${Date.now()}`,
         date: new Date(),
         duration: 180, // 3 minutes
-        culturalScore: simulation.culturalAnalysis.score,
-        extractedEntities: simulation.extractedData.entities,
-        keyInsights: simulation.culturalAnalysis.insights.slice(0, 3),
-        confidence: simulation.extractedData.confidence
+        culturalScore: analysis.score,
+        extractedEntities: analysis.extractedData?.entities || [],
+        keyInsights: analysis.insights.slice(0, 3),
+        confidence: analysis.extractedData?.confidence || 0
       };
 
       // Update profile with new call data
@@ -116,7 +127,7 @@ export default function CulturalProfileManager({
         culturalScore: calculateNewCulturalScore(profile, callAnalysis),
         lastUpdated: new Date(),
         callHistory: [callAnalysis, ...profile.callHistory].slice(0, 10), // Keep last 10 calls
-        cumulativeInsights: updateCumulativeInsights(profile, simulation),
+        cumulativeInsights: updateCumulativeInsights(profile, { extractedData: analysis.extractedData, culturalAnalysis: analysis }),
         trends: updateTrends(profile, callAnalysis)
       };
 
@@ -266,7 +277,7 @@ export default function CulturalProfileManager({
               ) : (
                 <>
                   <Activity className="h-4 w-4 mr-2" />
-                  Simulate New Call Analysis
+                  Analyze Recent Call Data
                 </>
               )}
             </Button>

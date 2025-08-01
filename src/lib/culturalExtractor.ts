@@ -1,3 +1,4 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 import { qloo } from './qloo';
 
 // Cultural keywords and patterns to extract from conversation transcripts
@@ -137,55 +138,54 @@ class CulturalIntelligenceExtractor {
   }
 
   /**
-   * Simulate real-time analysis for demo purposes
+   * Process real-time transcript chunks as they arrive
    */
-  async simulateCallAnalysis(candidateName: string): Promise<{
-    transcript: string;
+  async processRealTimeTranscript(
+    transcriptChunk: string,
+    existingTranscript: string = '',
+    roleType: string = 'Sales Role'
+  ): Promise<{
+    fullTranscript: string;
     culturalAnalysis: any;
     extractedData: CulturalExtraction;
+    shouldUpdate: boolean;
   }> {
-    // Simulated conversation transcript based on candidate
-    const simulatedTranscripts = {
-      'Alex Rivera': `Hi Alex, tell me about your interests outside of work. 
-        Well, I'm really passionate about film - I love Christopher Nolan movies like Inception and Interstellar. 
-        I also listen to a lot of jazz music, especially Miles Davis and John Coltrane. 
-        On weekends, I enjoy going to art galleries and I'm really into contemporary photography. 
-        I'm also fascinated by technology and AI innovations.`,
-      
-      'Maya Chen': `What do you enjoy doing in your free time, Maya?
-        I'm a huge art enthusiast - I love visiting museums and galleries. 
-        I'm particularly drawn to modern art and abstract expressionism. 
-        I also enjoy fashion and follow designers like Virgil Abloh and Rei Kawakubo. 
-        For entertainment, I love indie films and foreign cinema, especially Korean directors like Bong Joon-ho.`,
-      
-      'Jordan Smith': `Jordan, what are your hobbies and interests?
-        I'm really into music - I go to a lot of concerts and music festivals. 
-        I love hip-hop, electronic music, and discovered some amazing artists on Spotify. 
-        I'm also active on social media and love creating content. 
-        I enjoy streaming on Twitch and following entertainment trends.`,
-      
-      'Priya Patel': `Tell me about your personal interests, Priya.
-        I'm an avid reader - I love both fiction and non-fiction books. 
-        Recently I've been reading a lot of historical biographies and literary fiction. 
-        I'm also interested in education and learning new things. 
-        I enjoy documentaries, especially those about history and culture.`,
-      
-      'Marcus Johnson': `What do you like to do outside of work, Marcus?
-        I'm really into sports - I play basketball regularly and follow the NBA. 
-        I also love fitness and working out at the gym. 
-        I'm passionate about community involvement and volunteer coaching. 
-        I enjoy action movies and sports documentaries.`
-    };
+    const fullTranscript = existingTranscript + ' ' + transcriptChunk;
+    
+    // Only analyze if we have substantial content
+    const shouldUpdate = fullTranscript.length > 100 && transcriptChunk.length > 10;
+    
+    if (!shouldUpdate) {
+      return {
+        fullTranscript,
+        culturalAnalysis: null,
+        extractedData: { entities: [], keywords: [], categories: [], confidence: 0 },
+        shouldUpdate: false
+      };
+    }
 
-    const transcript = simulatedTranscripts[candidateName as keyof typeof simulatedTranscripts] || 
-                     simulatedTranscripts['Alex Rivera'];
-
-    const culturalAnalysis = await this.analyzeCulturalFitFromConversation(transcript, 'Creative Role');
+    const culturalAnalysis = await this.analyzeCulturalFitFromConversation(fullTranscript, roleType);
     
     return {
-      transcript,
+      fullTranscript,
       culturalAnalysis,
-      extractedData: culturalAnalysis.extractedData || { entities: [], keywords: [], categories: [], confidence: 0 }
+      extractedData: culturalAnalysis.extractedData || { entities: [], keywords: [], categories: [], confidence: 0 },
+      shouldUpdate: true
+    };
+  }
+
+  /**
+   * Initialize real-time cultural analysis session
+   */
+  initializeAnalysisSession(sessionId: string, candidateName: string, roleType: string) {
+    return {
+      sessionId,
+      candidateName,
+      roleType,
+      transcript: '',
+      lastAnalysis: null,
+      isActive: true,
+      startTime: new Date()
     };
   }
 

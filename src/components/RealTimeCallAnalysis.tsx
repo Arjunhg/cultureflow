@@ -1,3 +1,4 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -5,15 +6,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Phone, PhoneOff, Mic, MicOff, Loader2, TrendingUp, Users, Brain, AlertCircle } from 'lucide-react';
 import { culturalExtractor, type CulturalExtraction } from '@/lib/culturalExtractor';
+import { useRealTimeTranscript } from '@/hooks/useRealTimeTranscript';
+import { useSessionStore } from '@/store/useSessionStore';
 
 interface RealTimeCallAnalysisProps {
   candidateName: string;
   roleType?: string;
+  sessionId?: string;
+  autoStart?: boolean;
   onAnalysisUpdate?: (analysis: any) => void;
 }
 
@@ -30,10 +34,12 @@ interface CallState {
 export default function RealTimeCallAnalysis({ 
   candidateName, 
   roleType = 'Sales Role',
+  sessionId,
+  autoStart = false,
   onAnalysisUpdate 
 }: RealTimeCallAnalysisProps) {
   const [callState, setCallState] = useState<CallState>({
-    isActive: false,
+    isActive: autoStart,
     isMuted: false,
     duration: 0,
     transcript: '',
@@ -42,10 +48,37 @@ export default function RealTimeCallAnalysis({
     isAnalyzing: false
   });
 
-  // For now, we'll simulate the transcript connection
-  // In a real implementation, this would connect to AssemblyAI streaming
-  const [liveTranscript, setLiveTranscript] = useState('');
-  const [isConnected, setIsConnected] = useState(false);
+  const { updateTranscript, updateCulturalAnalysis } = useSessionStore();
+  // const session = sessionId ? getSession(sessionId) : null;
+
+  // Real-time transcript connection
+  const {
+    isConnected,
+    isConnecting,
+    error: transcriptError,
+    connect: connectTranscript,
+    disconnect: disconnectTranscript,
+    simulateRealTimeTranscript
+  } = useRealTimeTranscript({
+    sessionId: sessionId || `call-${candidateName}`,
+    enabled: callState.isActive,
+    onTranscriptUpdate: async (fullTranscript, chunk) => {
+      setCallState(prev => ({ ...prev, transcript: fullTranscript }));
+      
+      // Update session store if we have a session
+      if (sessionId) {
+        updateTranscript(sessionId, fullTranscript);
+      }
+      
+      // Process the new chunk for cultural analysis
+      if (chunk.length > 10) {
+        debouncedAnalysis(fullTranscript, chunk);
+      }
+    },
+    onError: (error) => {
+      console.error('Transcript error:', error);
+    }
+  });
 
   // Update call duration
   useEffect(() => {
@@ -58,35 +91,66 @@ export default function RealTimeCallAnalysis({
     return () => clearInterval(interval);
   }, [callState.isActive]);
 
-  // Process live transcript for cultural analysis
+  // Monitor connection status and start demo if needed
   useEffect(() => {
-    if (liveTranscript && callState.isActive) {
-      setCallState(prev => ({ ...prev, transcript: liveTranscript }));
-      debouncedAnalysis(liveTranscript);
+    if (callState.isActive && transcriptError && !isConnected && !isConnecting) {
+      // If we have an authorization error or other connection issues, start simulation
+      if (transcriptError.includes('Not authorized') || transcriptError.includes('Authentication failed') || transcriptError.includes('Connection lost')) {
+        const demoTimeout = setTimeout(() => {
+          if (!isConnected && callState.transcript.length === 0) {
+            console.log('Starting simulation due to connection issues:', transcriptError);
+            simulateRealTimeTranscript(candidateName);
+          }
+        }, 1000); // Quick fallback for auth errors
+        
+        return () => clearTimeout(demoTimeout);
+      }
     }
-  }, [liveTranscript, callState.isActive]);
+  }, [callState.isActive, transcriptError, isConnected, isConnecting, callState.transcript.length, candidateName, simulateRealTimeTranscript]);
 
   // Debounced analysis to prevent too frequent API calls
   const debouncedAnalysis = useCallback(
-    debounce(async (transcript: string) => {
+    debounce(async (transcript: string, chunk?: string) => {
       if (transcript.length < 50) return; // Wait for more content
       
       setCallState(prev => ({ ...prev, isAnalyzing: true }));
       
       try {
-        const analysis = await culturalExtractor.analyzeCulturalFitFromConversation(
-          transcript, 
-          roleType
-        );
+        // Use real-time processing if chunk provided, otherwise full analysis
+        let analysis, extractedData;
         
-        setCallState(prev => ({
-          ...prev,
-          culturalAnalysis: analysis,
-          extractedData: analysis.extractedData || { entities: [], keywords: [], categories: [], confidence: 0 },
-          isAnalyzing: false
-        }));
+        if (chunk) {
+          const result = await culturalExtractor.processRealTimeTranscript(chunk, transcript, roleType);
+          analysis = result.culturalAnalysis;
+          extractedData = result.extractedData;
+          
+          // Only update if we have meaningful results
+          if (!result.shouldUpdate) {
+            setCallState(prev => ({ ...prev, isAnalyzing: false }));
+            return;
+          }
+        } else {
+          analysis = await culturalExtractor.analyzeCulturalFitFromConversation(transcript, roleType);
+          extractedData = analysis.extractedData || { entities: [], keywords: [], categories: [], confidence: 0 };
+        }
         
-        onAnalysisUpdate?.(analysis);
+        if (analysis) {
+          setCallState(prev => ({
+            ...prev,
+            culturalAnalysis: analysis,
+            extractedData,
+            isAnalyzing: false
+          }));
+          
+          // Update session store if we have a session
+          if (sessionId) {
+            updateCulturalAnalysis(sessionId, analysis, extractedData);
+          }
+          
+          onAnalysisUpdate?.(analysis);
+        } else {
+          setCallState(prev => ({ ...prev, isAnalyzing: false }));
+        }
       } catch (error) {
         console.error('Real-time analysis error:', error);
         setCallState(prev => ({ ...prev, isAnalyzing: false }));
@@ -105,21 +169,26 @@ export default function RealTimeCallAnalysis({
       extractedData: { entities: [], keywords: [], categories: [], confidence: 0 }
     }));
 
-    // Simulate connection to live transcript
-    setIsConnected(true);
-
-    // For demo purposes, simulate a call with realistic data
-    setTimeout(async () => {
-      const simulation = await culturalExtractor.simulateCallAnalysis(candidateName);
-      setLiveTranscript(simulation.transcript);
-      setCallState(prev => ({
-        ...prev,
-        transcript: simulation.transcript,
-        culturalAnalysis: simulation.culturalAnalysis,
-        extractedData: simulation.extractedData
-      }));
-      onAnalysisUpdate?.(simulation.culturalAnalysis);
-    }, 2000);
+    console.log('Starting cultural analysis for:', candidateName);
+    
+    try {
+      // Await the connection promise from the hook
+      const connected = await connectTranscript();
+      
+      if (connected) {
+        console.log('Real-time connection established successfully.');
+        // Connection successful - will wait for actual audio input
+        // If no audio input comes in, user can manually start simulation or it will auto-fallback
+        console.log('AssemblyAI is ready for audio input. Speak into your microphone or use simulation.');
+      } else {
+        console.log('Connection function returned false, starting simulation.');
+        setTimeout(() => simulateRealTimeTranscript(candidateName), 1000);
+      }
+    } catch (error) {
+      // If the promise from connectTranscript is rejected, it will be caught here
+      console.error('Failed to connect to real-time transcript, starting simulation:', error);
+      setTimeout(() => simulateRealTimeTranscript(candidateName), 1000);
+    }
   };
 
   const endCall = () => {
@@ -128,8 +197,7 @@ export default function RealTimeCallAnalysis({
       isActive: false, 
       isMuted: false 
     }));
-    setIsConnected(false);
-    setLiveTranscript('');
+    disconnectTranscript();
   };
 
   const toggleMute = () => {
@@ -167,7 +235,7 @@ export default function RealTimeCallAnalysis({
                   size="lg"
                 >
                   <Phone className="h-4 w-4 mr-2" />
-                  Start Analysis Call
+                  Start Cultural Analysis
                 </Button>
               ) : (
                 <div className="flex items-center gap-2">
@@ -185,6 +253,16 @@ export default function RealTimeCallAnalysis({
                   >
                     {callState.isMuted ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
                   </Button>
+                  {isConnected && !transcriptError && callState.transcript.length === 0 && (
+                    <Button 
+                      onClick={() => simulateRealTimeTranscript(candidateName)}
+                      variant="outline"
+                      className="text-blue-600 border-blue-600 hover:bg-blue-50"
+                    >
+                      <Brain className="h-4 w-4 mr-2" />
+                      Start Demo
+                    </Button>
+                  )}
                 </div>
               )}
             </div>
@@ -197,6 +275,21 @@ export default function RealTimeCallAnalysis({
                 {isConnected && (
                   <Badge variant="outline" className="text-green-600 border-green-600">
                     Live Transcript Active
+                  </Badge>
+                )}
+                {isConnecting && (
+                  <Badge variant="outline" className="text-yellow-600 border-yellow-600">
+                    Connecting...
+                  </Badge>
+                )}
+                {transcriptError && (transcriptError.includes('demo') || transcriptError.includes('Not authorized') || transcriptError.includes('simulation')) && (
+                  <Badge variant="outline" className="text-blue-600 border-blue-600">
+                    Demo Mode Active
+                  </Badge>
+                )}
+                {transcriptError && !transcriptError.includes('demo') && !transcriptError.includes('Not authorized') && !transcriptError.includes('simulation') && (
+                  <Badge variant="outline" className="text-red-600 border-red-600">
+                    Connection Error
                   </Badge>
                 )}
                 {isAnalyzing && (
