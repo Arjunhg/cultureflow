@@ -4,10 +4,11 @@ import FeatureSectionLayout from "./_components/FeatureSectionLayout";
 import Image from "next/image";
 import { potentialCustomer } from "@/lib/data";
 import UserInfoCard from "@/components/ui/ReusableComponents/UserInfoCard";
+import QlooTestComponent from "@/components/QlooTestComponent";
 
 const HomePage = () => {
     return (
-        <div className="w-full mx-auto h-full space-y-12 bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-100 dark:from-slate-900 dark:via-purple-900 dark:to-indigo-900 relative overflow-hidden min-h-screen">
+        <div className="w-full mx-auto h-full space-y-16 bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-100 dark:from-slate-900 dark:via-purple-900 dark:to-indigo-900 relative overflow-hidden min-h-screen">
             {/* Background Pattern */}
             <div className="absolute inset-0 opacity-5">
                 <div className="absolute top-20 left-20">
@@ -27,11 +28,11 @@ const HomePage = () => {
                 </div>
             </div>
             
-            <div className="relative z-10 p-6">
+            <div className="relative z-10 p-6 lg:p-8">
             {/* Hero Section */}
-            <div className="w-full flex flex-col lg:flex-row justify-between items-start gap-12">
+            <div className="w-full flex flex-col lg:flex-row justify-between items-start gap-12 mb-16">
                 <div className="space-y-8 flex-1">
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-200/30 dark:border-purple-700/30 backdrop-blur-sm">
                             <Brain className="w-4 h-4 text-purple-600 dark:text-purple-400"/>
                             <span className="text-sm font-medium text-slate-700 dark:text-purple-300">Cultural Intelligence Sales Platform</span>
@@ -39,13 +40,13 @@ const HomePage = () => {
                         <h1 className="text-5xl lg:text-6xl font-bold bg-gradient-to-r from-slate-800 via-purple-700 to-pink-600 dark:from-purple-100 dark:via-purple-200 dark:to-pink-200 bg-clip-text text-transparent leading-tight">
                             Transform Sales Through Cultural Intelligence
                         </h1>
-                        <p className="text-xl text-slate-600 dark:text-purple-400 max-w-2xl">
+                        <p className="text-xl text-slate-600 dark:text-purple-400 max-w-2xl leading-relaxed">
                             Leverage AI-powered cultural insights and personalized sales conversations to understand prospect preferences and maximize conversion rates.
                         </p>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 gap-6 place-content-center w-full lg:w-auto">
+                <div className="grid grid-cols-1 gap-6 place-content-center w-full lg:w-auto lg:max-w-md">
                     <FeatureCard
                         Icon={<Brain className="w-12 h-12 text-purple-600 dark:text-purple-400"/>}
                         heading="Cultural AI Agents"
@@ -62,7 +63,7 @@ const HomePage = () => {
             </div>
 
             {/* Stats Section */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
                 <div className="p-6 rounded-3xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-200/30 dark:border-purple-700/30 backdrop-blur-sm hover:scale-105 transition-all duration-300">
                     <div className="flex items-center gap-4">
                         <div className="p-3 rounded-2xl bg-purple-500/20">
@@ -96,6 +97,11 @@ const HomePage = () => {
                         </div>
                     </div>
                 </div>
+            </div>
+
+            {/* Qloo Cultural Intelligence Integration */}
+            <div className="w-full mb-16">
+                <QlooTestComponent />
             </div>
 
             {/* Analytics Section */}
