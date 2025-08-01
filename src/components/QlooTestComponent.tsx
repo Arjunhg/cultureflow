@@ -73,7 +73,7 @@ export default function QlooTestComponent() {
           <Button 
             onClick={testConnection} 
             disabled={isLoading}
-            className="w-full bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-600 hover:from-purple-700 hover:via-indigo-700 hover:to-purple-700 text-white border-0 rounded-2xl py-8 text-xl font-semibold shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02]"
+            className="w-full bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-600 hover:from-purple-700 hover:via-indigo-700 hover:to-purple-700 text-white border-0 rounded-2xl py-8 text-xl font-semibold shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02] cursor-pointer"
           >
             <div className="flex items-center justify-center gap-4">
               {isLoading ? (

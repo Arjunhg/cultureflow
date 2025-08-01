@@ -5,6 +5,7 @@ import Image from "next/image";
 import { potentialCustomer } from "@/lib/data";
 import UserInfoCard from "@/components/ui/ReusableComponents/UserInfoCard";
 import QlooTestComponent from "@/components/QlooTestComponent";
+import CulturalCandidatePreview from "@/components/CulturalCandidatePreview";
 
 const HomePage = () => {
     return (
@@ -102,6 +103,11 @@ const HomePage = () => {
             {/* Qloo Cultural Intelligence Integration */}
             <div className="w-full mb-16">
                 <QlooTestComponent />
+            </div>
+
+            {/* Cultural Candidate Analytics Preview */}
+            <div className="w-full mb-16">
+                <CulturalCandidatePreview />
             </div>
 
             {/* Analytics Section */}
