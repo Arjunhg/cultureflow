@@ -134,10 +134,9 @@ export const updateAssistant = async (
         keywords: ['HireFlow', 'technical', 'interview', 'hiring', 'collaboration']
       },
       // Add webhook URL for real-time session detection (requires HTTPS)
-      // For local development, either use ngrok tunnel or deploy to get HTTPS URL
-      // server: {
-      //   url: `${process.env.NEXT_PUBLIC_BASE_URL || process.env.VERCEL_URL || 'http://localhost:3000'}/api/vapi-webhook`
-      // },
+      server: {
+        url: `${process.env.NEXT_PUBLIC_BASE_URL || process.env.VERCEL_URL || 'http://localhost:3000'}/api/vapi-webhook`
+      },
       endCallFunctionEnabled: true,
       endCallMessage: "Thank you for your time today. The interview has been completed successfully. You should hear back from our team within the next few business days. Have a great day!",
       maxDurationSeconds: 360,
