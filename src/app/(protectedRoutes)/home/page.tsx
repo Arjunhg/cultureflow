@@ -1,4 +1,5 @@
-import {TrendingUp, Users, Brain, Target, Palette, Calendar, MessageSquare, Sparkles } from "lucide-react";
+import {TrendingUp, Users, Brain, Target, Palette, Calendar, MessageSquare, Sparkles, Activity } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import FeatureCard from "./_components/FeatureCard";
 import FeatureSectionLayout from "./_components/FeatureSectionLayout";
 import Image from "next/image";
@@ -6,6 +7,7 @@ import { potentialCustomer } from "@/lib/data";
 import UserInfoCard from "@/components/ui/ReusableComponents/UserInfoCard";
 import QlooTestComponent from "@/components/QlooTestComponent";
 import CulturalCandidatePreview from "@/components/CulturalCandidatePreview";
+import RealTimeAnalytics from "@/components/RealTimeAnalytics";
 
 const HomePage = () => {
     return (
@@ -108,6 +110,39 @@ const HomePage = () => {
             {/* Cultural Candidate Analytics Preview */}
             <div className="w-full mb-16">
                 <CulturalCandidatePreview />
+            </div>
+
+            {/* Real-time Analytics Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
+                <RealTimeAnalytics />
+                <FeatureSectionLayout
+                    heading="Live Cultural Intelligence Dashboard"
+                    link="/candidate"
+                >
+                    <div className="p-6 flex flex-col gap-6 items-start border rounded-3xl border-white/20 backdrop-blur-sm bg-white/5 hover:bg-white/10 transition-all duration-300">
+                        <div className="flex items-center gap-3">
+                            <Activity className="w-8 h-8 text-green-500" />
+                            <div>
+                                <h3 className="text-lg font-semibold text-slate-800 dark:text-purple-100">
+                                    Real-time Call Monitoring
+                                </h3>
+                                <p className="text-sm text-slate-600 dark:text-purple-300">
+                                    Monitor cultural insights as conversations happen
+                                </p>
+                            </div>
+                        </div>
+                        <div className="space-y-3 w-full">
+                            <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                                <span className="text-sm font-medium">Active Analysis Sessions</span>
+                                <Badge className="bg-green-500">Live</Badge>
+                            </div>
+                            <div className="flex items-center justify-between p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                                <span className="text-sm font-medium">Cultural Entities Detected</span>
+                                <Badge variant="outline">247 today</Badge>
+                            </div>
+                        </div>
+                    </div>
+                </FeatureSectionLayout>
             </div>
 
             {/* Analytics Section */}

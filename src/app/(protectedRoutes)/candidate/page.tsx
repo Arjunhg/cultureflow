@@ -6,8 +6,10 @@ import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { leadData } from './__tests__/data';
 import CulturalCandidateAnalysis from '@/components/CulturalCandidateAnalysis';
+import CulturalProfileManager from '@/components/CulturalProfileManager';
 
 const page = () => {
   const [expandedRow, setExpandedRow] = React.useState<number | null>(null);
@@ -133,13 +135,32 @@ const page = () => {
                     {expandedRow === idx && (
                       <TableRow className="border-0 bg-gradient-to-br from-purple-50/80 via-indigo-50/80 to-pink-50/80 dark:from-purple-900/20 dark:via-indigo-900/20 dark:to-pink-900/20">
                         <TableCell colSpan={4} className="py-6">
-                          <div className="max-w-4xl">
-                            <CulturalCandidateAnalysis
-                              candidateName={lead.name}
-                              candidateEmail={lead.email}
-                              preferences={lead.culturalPreferences}
-                              roleType={lead.roleType}
-                            />
+                          <div className="max-w-6xl">
+                            <Tabs defaultValue="analysis" className="space-y-4">
+                              <TabsList className="grid w-full grid-cols-2">
+                                <TabsTrigger value="analysis">Cultural Analysis</TabsTrigger>
+                                <TabsTrigger value="profile">Live Profile Manager</TabsTrigger>
+                              </TabsList>
+
+                              <TabsContent value="analysis">
+                                <CulturalCandidateAnalysis
+                                  candidateName={lead.name}
+                                  candidateEmail={lead.email}
+                                  preferences={lead.culturalPreferences}
+                                  roleType={lead.roleType}
+                                />
+                              </TabsContent>
+
+                              <TabsContent value="profile">
+                                <CulturalProfileManager
+                                  candidateId={`candidate-${idx}`}
+                                  candidateName={lead.name}
+                                  onProfileUpdate={(profile) => {
+                                    console.log('Profile updated for', lead.name, profile);
+                                  }}
+                                />
+                              </TabsContent>
+                            </Tabs>
                           </div>
                         </TableCell>
                       </TableRow>
